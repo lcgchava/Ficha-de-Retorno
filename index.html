@@ -107,6 +107,8 @@
   .grid { display: grid; gap: 14px 16px; }
   .grid-4 { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
   .grid-3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .field-wide { grid-column: 1 / -1; }
+  @media (min-width: 720px) { .field-wide { grid-column: span 2; } }
   .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
   .field > label, .label {
     font-size: 11px;
@@ -144,17 +146,46 @@
   }
   .other { margin-top: 2px; }
 
-  /* color select with swatch */
-  .sel-wrap { position: relative; display: flex; align-items: center; }
-  .sel-wrap select { padding-left: 38px; }
+  /* color dropdown with swatches (a native select cannot show colors in every browser) */
   .swatch {
-    position: absolute; left: 12px;
-    width: 16px; height: 16px; border-radius: 50%;
+    flex: none;
+    width: 18px; height: 18px; border-radius: 50%;
     border: 1px solid rgba(0, 0, 0, 0.3);
-    pointer-events: none;
     background: #fff;
   }
   .swatch.none { border-style: dashed; background: transparent; }
+  .cdd { position: relative; }
+  .cdd-btn {
+    width: 100%;
+    display: flex; align-items: center; gap: 10px;
+    text-align: left;
+    font: inherit; font-size: 15px; color: var(--ink);
+    background-color: #fff;
+    background-image: var(--chevron);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 10px 34px 10px 12px;
+    min-height: 44px;
+    cursor: pointer;
+  }
+  .cdd-btn.placeholder .cdd-text { color: #93A29D; }
+  .cdd-list {
+    position: absolute; z-index: 20;
+    left: 0; right: 0; top: calc(100% + 4px);
+    margin: 0; padding: 4px; list-style: none;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(10, 40, 34, 0.18);
+    max-height: min(320px, 60vh);
+    overflow: auto;
+  }
+  .cdd-list:focus { outline: none; }
+  .cdd-opt { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 3px; cursor: pointer; font-size: 15px; }
+  .cdd-opt:hover, .cdd-opt.active { background: #E4EFEC; }
+  .cdd-opt[aria-selected="true"] { font-weight: 600; background: var(--teal-wash); }
 
   /* number + unit */
   .combo { display: flex; }
@@ -302,6 +333,10 @@
     .combo select { background-color: #fff; }
     textarea { resize: none; }
     select:required:invalid { color: transparent; }
+    .cdd-list { display: none !important; }
+    .cdd-btn { background-image: none; padding-right: 12px; }
+    .cdd-btn.placeholder .cdd-text { color: transparent; }
+    .field.is-other .cdd { display: none; }
     #photo-section.no-photos { display: none; }
     .photos { grid-template-columns: repeat(2, 1fr); }
     #photo-section { break-before: page; }
@@ -373,15 +408,14 @@
         <input type="text" id="f-placa" placeholder="Ej. ABC-123" autocapitalize="characters" autocomplete="off" spellcheck="false">
       </div>
 
-      <div class="field">
-        <label for="f-color">Color</label>
-        <div class="sel-wrap">
-          <span class="swatch" id="swatch" aria-hidden="true"></span>
-          <select id="f-color" data-other="f-color-otro" required>
-          <option value="" disabled selected hidden>Selecciona…</option>
-            <option>Blanco</option><option>Negro</option><option>Gris</option><option>Plata</option><option>Azul</option><option>Rojo</option><option>Verde</option><option>Beige</option><option>Marrón</option><option>Naranja</option><option>Amarillo</option>
-            <option value="__otro">Otro…</option>
-          </select>
+      <div class="field" id="color-field">
+        <label id="color-label" for="f-color">Color</label>
+        <div class="cdd" id="cdd">
+          <button type="button" class="cdd-btn placeholder" id="f-color" aria-haspopup="listbox" aria-expanded="false" aria-labelledby="color-label cdd-text">
+            <span class="swatch none" id="swatch" aria-hidden="true"></span>
+            <span class="cdd-text" id="cdd-text">Selecciona…</span>
+          </button>
+          <ul class="cdd-list" id="cdd-list" role="listbox" aria-labelledby="color-label" tabindex="-1" hidden></ul>
         </div>
         <input type="text" class="other" id="f-color-otro" placeholder="¿Qué color?" aria-label="Color" hidden>
       </div>
@@ -404,27 +438,11 @@
         </div>
       </div>
 
-      <div class="field">
-        <label for="f-autonomia">Autonomía de combustible</label>
-        <div class="combo">
-          <input type="number" id="f-autonomia" placeholder="0" min="0" step="1" inputmode="numeric">
-          <select id="f-autonomia-u" aria-label="Unidad de la autonomía"><option selected>mi</option><option>km</option></select>
-        </div>
-      </div>
-
-      <div class="field">
-        <label for="f-consumo">Promedio de consumo</label>
-        <div class="combo">
-          <input type="number" id="f-consumo" placeholder="0.0" min="0" step="0.1" inputmode="decimal">
-          <select id="f-consumo-u" aria-label="Unidad del consumo"><option selected>MPG</option><option>km/L</option><option>L/100 km</option></select>
-        </div>
-      </div>
-
-      <div class="field">
+      <div class="field field-wide">
         <label for="f-lugar">Lugar de devolución</label>
         <select id="f-lugar" data-other="f-lugar-otro" required>
           <option value="" disabled selected hidden>Selecciona…</option>
-          <option>Garaje de alquiler de autos, Aeropuerto</option>
+          <option>Garaje de alquiler, Aeropuerto</option>
           <option>Aeropuerto Luis Muñoz Marín (SJU)</option>
           <option>Aeropuerto Rafael Hernández (BQN)</option>
           <option>Aeropuerto Mercedita (PSE)</option>
@@ -501,7 +519,7 @@
       </div>
     </div>
     <input type="file" id="add-input" accept="image/*" multiple hidden>
-    <p class="note no-print">Las fotos no se suben a ningún servidor. Se quedan en tu navegador y solo salen en el PDF que guardes.</p>
+    <p class="note no-print" id="photo-note">Las fotos no se suben a ningún servidor. Se quedan en tu navegador y solo salen en el PDF que guardes.</p>
   </section>
 
   <p class="foot">London Consulting Group · Ficha de Retorno de Unidad</p>
@@ -533,6 +551,7 @@
     var other = document.getElementById(sel.dataset.other);
     var field = sel.closest('.field');
     function sync() {
+      sel.title = sel.selectedIndex >= 0 ? sel.options[sel.selectedIndex].text : '';
       var on = sel.value === '__otro';
       other.hidden = !on;
       field.classList.toggle('is-other', on);
@@ -541,21 +560,93 @@
     sync();
   });
 
-  /* ---------- Color swatch ---------- */
-  var colors = {
-    'Blanco': '#FFFFFF', 'Negro': '#1A1A1A', 'Gris': '#8A8F94', 'Plata': '#C4C8CC',
-    'Azul': '#2F5DA8', 'Rojo': '#B52B2B', 'Verde': '#2E7A4F', 'Beige': '#D8C7A3',
-    'Marrón': '#6B4A32', 'Naranja': '#E07B21', 'Amarillo': '#E8C21E'
-  };
-  var colorSel = document.getElementById('f-color');
-  var swatch = document.getElementById('swatch');
-  function syncSwatch() {
-    var c = colors[colorSel.value];
-    swatch.classList.toggle('none', !c);
-    swatch.style.background = c || 'transparent';
+  /* ---------- Color dropdown with swatches ---------- */
+  var colorItems = [
+    ['Blanco', '#FFFFFF'], ['Negro', '#1A1A1A'], ['Gris', '#8A8F94'], ['Plata', '#C4C8CC'],
+    ['Azul', '#2F5DA8'], ['Rojo', '#B52B2B'], ['Verde', '#2E7A4F'], ['Beige', '#D8C7A3'],
+    ['Marrón', '#6B4A32'], ['Naranja', '#E07B21'], ['Amarillo', '#E8C21E'], ['Otro…', null]
+  ];
+  var cdd = document.getElementById('cdd');
+  var cddBtn = document.getElementById('f-color');
+  var cddList = document.getElementById('cdd-list');
+  var cddText = document.getElementById('cdd-text');
+  var cddSwatch = document.getElementById('swatch');
+  var colorOther = document.getElementById('f-color-otro');
+  var colorField = document.getElementById('color-field');
+  var chosen = -1, active = -1;
+
+  colorItems.forEach(function (it, i) {
+    var li = document.createElement('li');
+    li.className = 'cdd-opt';
+    li.id = 'cdd-opt-' + i;
+    li.setAttribute('role', 'option');
+    li.setAttribute('aria-selected', 'false');
+    var dot = document.createElement('span');
+    dot.className = 'swatch' + (it[1] ? '' : ' none');
+    if (it[1]) dot.style.background = it[1];
+    dot.setAttribute('aria-hidden', 'true');
+    var t = document.createElement('span');
+    t.textContent = it[0];
+    li.appendChild(dot);
+    li.appendChild(t);
+    li.addEventListener('mousedown', function (e) { e.preventDefault(); });
+    li.addEventListener('click', function () { chooseColor(i); closeColors(true); });
+    cddList.appendChild(li);
+  });
+
+  function renderColor() {
+    var it = chosen >= 0 ? colorItems[chosen] : null;
+    cddText.textContent = it ? it[0] : 'Selecciona…';
+    cddBtn.classList.toggle('placeholder', !it);
+    cddSwatch.className = 'swatch' + (it && it[1] ? '' : ' none');
+    cddSwatch.style.background = it && it[1] ? it[1] : '';
+    Array.prototype.forEach.call(cddList.children, function (li, k) {
+      li.setAttribute('aria-selected', k === chosen ? 'true' : 'false');
+    });
+    var other = !!(it && !it[1]);
+    colorOther.hidden = !other;
+    colorField.classList.toggle('is-other', other);
   }
-  colorSel.addEventListener('change', syncSwatch);
-  syncSwatch();
+  function chooseColor(i) {
+    chosen = i;
+    renderColor();
+    if (colorItems[i][1] === null) colorOther.focus();
+  }
+  function setActive(i) {
+    active = i;
+    Array.prototype.forEach.call(cddList.children, function (li, k) { li.classList.toggle('active', k === i); });
+    cddList.setAttribute('aria-activedescendant', 'cdd-opt-' + i);
+    var el = cddList.children[i];
+    if (el && el.scrollIntoView) el.scrollIntoView({ block: 'nearest' });
+  }
+  function openColors() {
+    cddList.hidden = false;
+    cddBtn.setAttribute('aria-expanded', 'true');
+    setActive(chosen >= 0 ? chosen : 0);
+    cddList.focus();
+  }
+  function closeColors(refocus) {
+    if (cddList.hidden) return;
+    cddList.hidden = true;
+    cddBtn.setAttribute('aria-expanded', 'false');
+    if (refocus) cddBtn.focus();
+  }
+  cddBtn.addEventListener('click', function () { if (cddList.hidden) openColors(); else closeColors(true); });
+  cddBtn.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') { e.preventDefault(); openColors(); }
+  });
+  cddList.addEventListener('keydown', function (e) {
+    var k = e.key, last = colorItems.length - 1;
+    if (k === 'ArrowDown') { e.preventDefault(); setActive(Math.min(active + 1, last)); }
+    else if (k === 'ArrowUp') { e.preventDefault(); setActive(Math.max(active - 1, 0)); }
+    else if (k === 'Home') { e.preventDefault(); setActive(0); }
+    else if (k === 'End') { e.preventDefault(); setActive(last); }
+    else if (k === 'Enter' || k === ' ') { e.preventDefault(); chooseColor(active); closeColors(true); }
+    else if (k === 'Escape') { e.preventDefault(); closeColors(true); }
+    else if (k === 'Tab') { closeColors(false); }
+  });
+  document.addEventListener('click', function (e) { if (!cdd.contains(e.target)) closeColors(false); });
+  renderColor();
 
   /* ---------- Today's date as the default ---------- */
   var d = new Date();
@@ -639,6 +730,7 @@
     var n = grid.querySelectorAll('.photo').length;
     countEl.textContent = n ? n + (n === 1 ? ' foto' : ' fotos') : '';
     document.getElementById('photo-section').classList.toggle('no-photos', n === 0);
+    document.getElementById('photo-note').hidden = n > 0;
   }
 
   function setImage(img, file) {
