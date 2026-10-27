@@ -1,0 +1,729 @@
+<title>Ficha de Retorno de Unidad</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500&family=IBM+Plex+Sans:wght@400;500;600&family=Source+Serif+4:wght@600;700&display=swap">
+<style>
+  /* Layout: a single paper-like sheet on a pale ground; header with the logo top right,
+     form blocks in a field grid (selects with an "Otro" escape hatch), state chips,
+     fuel slider beside the notes box, photo grid with an add tile.
+     Deliberately single-theme: a printed-form look, and the logo is dark on light. */
+  :root {
+    --ground: #E9EFED;
+    --sheet: #FFFFFF;
+    --ink: #17211E;
+    --ink-2: #566661;
+    --line: #C6D2CE;
+    --teal: #0E7C6B;
+    --teal-deep: #0A5A4E;
+    --teal-wash: #E2F0ED;
+    --alert: #A3411B;
+    --track: #DCE5E2;
+    --photo-bg: #1B2321;
+    --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23566661' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+    --font-display: "Source Serif 4", Georgia, "Times New Roman", serif;
+    --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.45;
+    padding-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 24px 40px;
+  }
+
+  .toolbar {
+    max-width: 880px;
+    margin: 0 auto 12px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px 14px;
+    flex-wrap: wrap;
+  }
+  .toolbar .hint { font-size: 12px; color: var(--ink-2); }
+  .btn-primary {
+    font: inherit; font-weight: 600; font-size: 14px;
+    color: #fff; background: var(--teal);
+    border: 0; border-radius: 3px;
+    padding: 10px 16px; min-height: 44px;
+    cursor: pointer;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .btn-primary:hover { background: var(--teal-deep); }
+
+  .sheet {
+    max-width: 880px;
+    margin: 0 auto;
+    background: var(--sheet);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: clamp(18px, 4vw, 40px);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* header */
+  .head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px 24px;
+    flex-wrap: wrap;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--teal);
+  }
+  .head-text { min-width: 0; flex: 1 1 280px; }
+  h1 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: clamp(24px, 4.4vw, 32px);
+    line-height: 1.12;
+    margin: 0 0 6px;
+    text-wrap: balance;
+  }
+  .sub { margin: 0; color: var(--ink-2); font-size: 14px; }
+  .logo { height: 56px; width: auto; max-width: 100%; display: block; margin-left: auto; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 19px;
+    color: var(--teal-deep);
+    margin: 0 0 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  h2 .count { font-family: var(--font-body); font-weight: 500; font-size: 13px; color: var(--ink-2); }
+
+  /* fields */
+  .grid { display: grid; gap: 14px 16px; }
+  .grid-4 { grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+  .grid-3 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .field > label, .label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  input[type="text"], input[type="date"], input[type="number"], textarea, select {
+    width: 100%;
+    font: inherit;
+    font-size: 15px;
+    color: var(--ink);
+    background-color: #fff;
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 10px 12px;
+    min-height: 44px;
+  }
+  select {
+    -webkit-appearance: none;
+    appearance: none;
+    background-image: var(--chevron);
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 34px;
+    cursor: pointer;
+    text-overflow: ellipsis;
+  }
+  input::placeholder, textarea::placeholder { color: #93A29D; }
+  textarea { min-height: 200px; resize: vertical; line-height: 1.5; }
+  input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible, .tile:focus-visible, .photo-img:focus-visible, input[type="range"]:focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
+  }
+  .other { margin-top: 2px; }
+
+  /* color select with swatch */
+  .sel-wrap { position: relative; display: flex; align-items: center; }
+  .sel-wrap select { padding-left: 38px; }
+  .swatch {
+    position: absolute; left: 12px;
+    width: 16px; height: 16px; border-radius: 50%;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+    background: #fff;
+  }
+  .swatch.none { border-style: dashed; background: transparent; }
+
+  /* number + unit */
+  .combo { display: flex; }
+  .combo input { border-radius: 3px 0 0 3px; flex: 1; min-width: 0; font-variant-numeric: tabular-nums; }
+  .combo select { width: 92px; flex: none; border-radius: 0 3px 3px 0; margin-left: -1px; background-color: #F4F8F7; }
+  .combo input:focus-visible, .combo select:focus-visible { position: relative; z-index: 1; }
+
+  /* state chips */
+  .chips { border: 0; padding: 0; margin: 0 0 18px; min-width: 0; }
+  .chips legend { padding: 0; margin-bottom: 8px; }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { position: relative; display: inline-flex; }
+  .chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+  .chip span {
+    display: inline-flex; align-items: center;
+    min-height: 40px; padding: 6px 14px;
+    border: 1px solid var(--line); border-radius: 20px;
+    font-size: 14px; background: #fff; cursor: pointer; user-select: none;
+  }
+  .chip:hover span { border-color: var(--teal); }
+  .chip input:checked + span { background: var(--alert); border-color: var(--alert); color: #fff; }
+  .chip.ok input:checked + span { background: var(--teal); border-color: var(--teal); }
+  .chip input:focus-visible + span { outline: 2px solid var(--teal); outline-offset: 2px; }
+
+  /* notes + fuel */
+  .notes-row { display: grid; grid-template-columns: minmax(0, 1fr) 290px; gap: 16px; align-items: stretch; }
+  .notes-row .field { height: 100%; }
+  .notes-row textarea { flex: 1; }
+  @media (max-width: 680px) { .notes-row { grid-template-columns: minmax(0, 1fr); } }
+
+  .fuel {
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 16px 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #fff;
+  }
+  .fuel-read { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+  .fuel-pct { font-family: var(--font-mono); font-weight: 500; font-size: 34px; line-height: 1; font-variant-numeric: tabular-nums; }
+  .fuel-word { font-size: 13px; font-weight: 600; color: var(--teal-deep); background: var(--teal-wash); padding: 3px 9px; border-radius: 10px; }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 34px;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    --p: 1;
+    touch-action: pan-y;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 14px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: linear-gradient(to right, var(--teal) calc(13px + (100% - 26px) * var(--p)), var(--track) calc(13px + (100% - 26px) * var(--p)));
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 28px; height: 28px;
+    margin-top: -8px;
+    border-radius: 50%;
+    background: #fff;
+    border: 4px solid var(--teal-deep);
+    box-shadow: 0 1px 3px rgba(10, 40, 34, 0.35);
+  }
+  input[type="range"]::-moz-range-track { height: 14px; border-radius: 7px; border: 1px solid var(--line); background: var(--track); }
+  input[type="range"]::-moz-range-progress { height: 14px; border-radius: 7px; background: var(--teal); }
+  input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff; border: 4px solid var(--teal-deep); box-shadow: 0 1px 3px rgba(10, 40, 34, 0.35); }
+
+  .ticks { position: relative; height: 30px; margin: -4px 14px 0; }
+  .tick { position: absolute; top: 0; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 12px; font-weight: 600; color: var(--ink-2); }
+  .tick::before { content: ""; width: 1px; height: 6px; background: var(--ink-2); }
+  .fuel-hint { font-size: 12px; color: var(--ink-2); margin: 0; }
+
+  /* photos */
+  .photos { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 18px 16px; }
+  .photo { margin: 0; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .photo-img {
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    background: var(--photo-bg);
+    border-radius: 3px;
+    padding: 0;
+    border: 0;
+    cursor: pointer;
+    overflow: hidden;
+    position: relative;
+    display: block;
+  }
+  .photo-img img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .photo-img::after {
+    content: "Cambiar foto";
+    position: absolute; inset: auto 8px 8px auto;
+    font-size: 12px; font-weight: 600;
+    color: #fff; background: rgba(10, 30, 26, 0.78);
+    padding: 4px 9px; border-radius: 10px;
+    opacity: 0; transition: opacity 0.15s;
+  }
+  .photo-img:hover::after, .photo-img:focus-visible::after { opacity: 1; }
+  .photo-bar { display: flex; gap: 8px; align-items: center; }
+  .photo-bar input[type="text"] { min-height: 38px; padding: 7px 10px; font-size: 14px; flex: 1; min-width: 0; }
+  .btn-text {
+    font: inherit; font-size: 13px; font-weight: 600;
+    color: var(--ink-2); background: none; border: 0; padding: 8px 6px; min-height: 38px; cursor: pointer; border-radius: 3px;
+  }
+  .btn-text:hover { color: #A12D2D; background: #FBEDED; }
+
+  .tile {
+    aspect-ratio: 4 / 3;
+    width: 100%;
+    border: 2px dashed var(--teal);
+    background: var(--teal-wash);
+    color: var(--teal-deep);
+    border-radius: 3px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    font: inherit; font-weight: 600; font-size: 16px;
+    cursor: pointer;
+    padding: 12px;
+    text-align: center;
+  }
+  .tile small { font-weight: 400; font-size: 13px; color: var(--ink-2); }
+  .tile .plus { font-size: 34px; line-height: 1; font-weight: 400; }
+  .tile:hover, .photos.drag .tile { background: #D0E8E3; }
+  .add-wrap { display: flex; flex-direction: column; gap: 8px; }
+
+  .foot { font-size: 12px; color: var(--ink-2); text-align: center; border-top: 1px solid var(--line); padding-top: 14px; margin: 0; }
+
+  select:required:invalid { color: #93A29D; }
+  .note { font-size: 12px; color: var(--ink-2); margin: 12px 0 0; max-width: 62ch; }
+
+  @page { size: letter; margin: 12mm; }
+  @media print {
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    body { background: #fff; padding: 0; font-size: 13px; }
+    .sheet { border: 0; padding: 0; gap: 22px; max-width: none; }
+    .no-print, .toolbar, .btn-text, .add-wrap, .fuel-hint, .photo-img::after, .chip:has(input:not(:checked)) { display: none !important; }
+    .chip input:not(:checked) + span { display: none; }
+    select { background-image: none; padding-right: 12px; }
+    .field.is-other select { display: none; }
+    .combo select { background-color: #fff; }
+    textarea { resize: none; }
+    select:required:invalid { color: transparent; }
+    #photo-section.no-photos { display: none; }
+    .photos { grid-template-columns: repeat(2, 1fr); }
+    #photo-section { break-before: page; }
+    .photo { break-inside: avoid; }
+    .photo-bar input[type="text"] { border-color: transparent; padding-left: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { .photo-img::after { transition: none; } }
+</style>
+
+<div class="toolbar no-print" id="toolbar" hidden>
+  <span class="hint">En el cuadro de impresión elige «Guardar como PDF».</span>
+  <button type="button" class="btn-primary" id="btn-pdf">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9V3h12v6"/><path d="M6 18H4a1 1 0 0 1-1-1v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6a1 1 0 0 1-1 1h-2"/><rect x="6" y="14" width="12" height="7"/></svg>
+    Guardar como PDF
+  </button>
+</div>
+
+<main class="sheet">
+  <header class="head">
+    <div class="head-text">
+      <h1>Ficha de Retorno de Unidad</h1>
+      <p class="sub">Alquiler de vehículo · Devolución de unidad</p>
+    </div>
+    <img class="logo" src="logo.png" alt="London Consulting Group">
+  </header>
+
+  <section aria-labelledby="h-unidad">
+    <h2 id="h-unidad">Datos de la unidad</h2>
+    <div class="grid grid-4">
+
+      <div class="field">
+        <label for="f-modelo">Marca / Modelo</label>
+        <select id="f-modelo" data-other="f-modelo-otro" required>
+          <option value="" disabled selected hidden>Selecciona…</option>
+          <optgroup label="Hyundai">
+            <option>Hyundai Accent</option><option>Hyundai Elantra</option><option>Hyundai Kona</option><option>Hyundai Santa Fe</option><option>Hyundai Tucson</option><option>Hyundai Venue</option>
+          </optgroup>
+          <optgroup label="Kia">
+            <option>Kia Forte</option><option>Kia Rio</option><option>Kia Seltos</option><option>Kia Soul</option><option>Kia Sportage</option><option>Kia Sorento</option>
+          </optgroup>
+          <optgroup label="Toyota">
+            <option>Toyota Camry</option><option>Toyota Corolla</option><option>Toyota Highlander</option><option>Toyota RAV4</option><option>Toyota Yaris</option>
+          </optgroup>
+          <optgroup label="Nissan">
+            <option>Nissan Kicks</option><option>Nissan Rogue</option><option>Nissan Sentra</option><option>Nissan Versa</option>
+          </optgroup>
+          <optgroup label="Mitsubishi">
+            <option>Mitsubishi Eclipse Cross</option><option>Mitsubishi Mirage</option><option>Mitsubishi Outlander</option>
+          </optgroup>
+          <optgroup label="Chevrolet">
+            <option>Chevrolet Equinox</option><option>Chevrolet Malibu</option><option>Chevrolet Spark</option><option>Chevrolet Trax</option>
+          </optgroup>
+          <optgroup label="Honda">
+            <option>Honda Civic</option><option>Honda CR-V</option><option>Honda HR-V</option>
+          </optgroup>
+          <optgroup label="Mazda">
+            <option>Mazda CX-30</option><option>Mazda CX-5</option><option>Mazda3</option>
+          </optgroup>
+          <optgroup label="Ford y Jeep">
+            <option>Ford Escape</option><option>Ford Explorer</option><option>Jeep Compass</option><option>Jeep Renegade</option><option>Jeep Wrangler</option>
+          </optgroup>
+          <option value="__otro">Otro…</option>
+        </select>
+        <input type="text" class="other" id="f-modelo-otro" placeholder="Marca y modelo" aria-label="Marca y modelo" hidden>
+      </div>
+
+      <div class="field">
+        <label for="f-placa">Placa</label>
+        <input type="text" id="f-placa" placeholder="Ej. ABC-123" autocapitalize="characters" autocomplete="off" spellcheck="false">
+      </div>
+
+      <div class="field">
+        <label for="f-color">Color</label>
+        <div class="sel-wrap">
+          <span class="swatch" id="swatch" aria-hidden="true"></span>
+          <select id="f-color" data-other="f-color-otro" required>
+          <option value="" disabled selected hidden>Selecciona…</option>
+            <option>Blanco</option><option>Negro</option><option>Gris</option><option>Plata</option><option>Azul</option><option>Rojo</option><option>Verde</option><option>Beige</option><option>Marrón</option><option>Naranja</option><option>Amarillo</option>
+            <option value="__otro">Otro…</option>
+          </select>
+        </div>
+        <input type="text" class="other" id="f-color-otro" placeholder="¿Qué color?" aria-label="Color" hidden>
+      </div>
+
+      <div class="field">
+        <label for="f-agencia">Agencia</label>
+        <select id="f-agencia" data-other="f-agencia-otro" required>
+          <option value="" disabled selected hidden>Selecciona…</option>
+          <option>Alamo</option><option>Avis</option><option>Budget</option><option>Charlie Car Rental</option><option>Dollar</option><option>Enterprise</option><option>Hertz</option><option>Hyundai de Fajardo (Rental)</option><option>National</option><option>Payless</option><option>Sixt</option><option>Thrifty</option>
+          <option value="__otro">Otra…</option>
+        </select>
+        <input type="text" class="other" id="f-agencia-otro" placeholder="Nombre de la agencia" aria-label="Agencia" hidden>
+      </div>
+
+      <div class="field">
+        <label for="f-odometro">Odómetro al retorno</label>
+        <div class="combo">
+          <input type="number" id="f-odometro" placeholder="0" min="0" step="1" inputmode="numeric">
+          <select id="f-odometro-u" aria-label="Unidad del odómetro"><option selected>mi</option><option>km</option></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-autonomia">Autonomía de combustible</label>
+        <div class="combo">
+          <input type="number" id="f-autonomia" placeholder="0" min="0" step="1" inputmode="numeric">
+          <select id="f-autonomia-u" aria-label="Unidad de la autonomía"><option selected>mi</option><option>km</option></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-consumo">Promedio de consumo</label>
+        <div class="combo">
+          <input type="number" id="f-consumo" placeholder="0.0" min="0" step="0.1" inputmode="decimal">
+          <select id="f-consumo-u" aria-label="Unidad del consumo"><option selected>MPG</option><option>km/L</option><option>L/100 km</option></select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="f-lugar">Lugar de devolución</label>
+        <select id="f-lugar" data-other="f-lugar-otro" required>
+          <option value="" disabled selected hidden>Selecciona…</option>
+          <option>Garaje de alquiler de autos, Aeropuerto</option>
+          <option>Aeropuerto Luis Muñoz Marín (SJU)</option>
+          <option>Aeropuerto Rafael Hernández (BQN)</option>
+          <option>Aeropuerto Mercedita (PSE)</option>
+          <option>Sucursal de la agencia</option>
+          <option>Hotel</option>
+          <option value="__otro">Otro lugar…</option>
+        </select>
+        <input type="text" class="other" id="f-lugar-otro" placeholder="Dirección o lugar" aria-label="Lugar de devolución" hidden>
+      </div>
+
+    </div>
+  </section>
+
+  <section aria-labelledby="h-entrega">
+    <h2 id="h-entrega">Entrega y recepción</h2>
+    <div class="grid grid-3">
+      <div class="field"><label for="f-entrega">Entregado por</label><input type="text" id="f-entrega" list="dl-names" placeholder="Nombre de quien entrega" autocomplete="off"></div>
+      <div class="field"><label for="f-recibe">Recibido por</label><input type="text" id="f-recibe" list="dl-names" placeholder="Nombre de quien recibe" autocomplete="off"></div>
+      <div class="field"><label for="f-fecha">Fecha</label><input type="date" id="f-fecha"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-obs">
+    <h2 id="h-obs">Estado, observaciones y combustible</h2>
+
+    <fieldset class="chips" id="state">
+      <legend class="label">Estado de la unidad (marca lo que aplique)</legend>
+      <div class="chip-list">
+        <label class="chip ok"><input type="checkbox" value="ok"><span>Sin daños nuevos</span></label>
+        <label class="chip"><input type="checkbox" value="x"><span>Rayones</span></label>
+        <label class="chip"><input type="checkbox" value="x"><span>Abolladuras</span></label>
+        <label class="chip"><input type="checkbox" value="x"><span>Cristales o parabrisas</span></label>
+        <label class="chip"><input type="checkbox" value="x"><span>Llantas o aros</span></label>
+        <label class="chip"><input type="checkbox" value="x"><span>Luces</span></label>
+        <label class="chip"><input type="checkbox" value="x"><span>Interior sucio</span></label>
+        <label class="chip"><input type="checkbox" value="x"><span>Faltan accesorios</span></label>
+        <label class="chip"><input type="checkbox" value="x"><span>Otro daño</span></label>
+      </div>
+    </fieldset>
+
+    <div class="notes-row">
+      <div class="field">
+        <label for="f-obs">Observaciones</label>
+        <textarea id="f-obs" placeholder="Detalla dónde está cada daño, objetos olvidados o cualquier comentario sobre el estado de la unidad."></textarea>
+      </div>
+      <div class="fuel">
+        <span class="label" id="fuel-label">Nivel de combustible al retorno</span>
+        <div class="fuel-read">
+          <span class="fuel-pct" id="fuel-pct" aria-hidden="true">100%</span>
+          <span class="fuel-word" id="fuel-word" aria-hidden="true">Lleno</span>
+        </div>
+        <input type="range" id="fuel" min="0" max="100" step="5" value="100" aria-labelledby="fuel-label" aria-valuetext="100%, lleno">
+        <div class="ticks" aria-hidden="true">
+          <span class="tick" style="left:0%">E</span>
+          <span class="tick" style="left:25%">¼</span>
+          <span class="tick" style="left:50%">½</span>
+          <span class="tick" style="left:75%">¾</span>
+          <span class="tick" style="left:100%">F</span>
+        </div>
+        <p class="fuel-hint no-print">Desliza la barra hasta el nivel que marca el tablero.</p>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-fotos" id="photo-section">
+    <h2 id="h-fotos">Registro fotográfico <span class="count" id="photo-count"></span></h2>
+    <div class="photos" id="photos">
+      <div class="add-wrap" id="add-wrap">
+        <button type="button" class="tile" id="add-tile">
+          <span class="plus" aria-hidden="true">+</span>
+          Agregar fotos
+          <small>Toca aquí o arrastra las imágenes</small>
+        </button>
+      </div>
+    </div>
+    <input type="file" id="add-input" accept="image/*" multiple hidden>
+    <p class="note no-print">Las fotos no se suben a ningún servidor. Se quedan en tu navegador y solo salen en el PDF que guardes.</p>
+  </section>
+
+  <p class="foot">London Consulting Group · Ficha de Retorno de Unidad</p>
+</main>
+
+<datalist id="dl-names"></datalist>
+<datalist id="dl-views">
+  <option value="Frente"><option value="Frente 3/4 izquierdo"><option value="Frente 3/4 derecho">
+  <option value="Lateral izquierdo"><option value="Lateral derecho">
+  <option value="Trasera"><option value="Trasera 3/4 izquierda"><option value="Trasera 3/4 derecha">
+  <option value="Capó"><option value="Techo"><option value="Parabrisas"><option value="Llantas y aros">
+  <option value="Interior delantero"><option value="Interior trasero"><option value="Maletero">
+  <option value="Tablero: odómetro y combustible"><option value="Detalle de daño">
+</datalist>
+
+<script>
+(function () {
+  /* ---------- "Guardar como PDF": only where the page owns the window (e.g. GitHub Pages) ---------- */
+  var toolbar = document.getElementById('toolbar');
+  try {
+    if (window.top === window.self) {
+      toolbar.hidden = false;
+      document.getElementById('btn-pdf').addEventListener('click', function () { window.print(); });
+    }
+  } catch (e) { /* embedded: keep the button hidden */ }
+
+  /* ---------- Selects with an "Otro…" escape hatch ---------- */
+  document.querySelectorAll('select[data-other]').forEach(function (sel) {
+    var other = document.getElementById(sel.dataset.other);
+    var field = sel.closest('.field');
+    function sync() {
+      var on = sel.value === '__otro';
+      other.hidden = !on;
+      field.classList.toggle('is-other', on);
+    }
+    sel.addEventListener('change', function () { sync(); if (sel.value === '__otro') other.focus(); });
+    sync();
+  });
+
+  /* ---------- Color swatch ---------- */
+  var colors = {
+    'Blanco': '#FFFFFF', 'Negro': '#1A1A1A', 'Gris': '#8A8F94', 'Plata': '#C4C8CC',
+    'Azul': '#2F5DA8', 'Rojo': '#B52B2B', 'Verde': '#2E7A4F', 'Beige': '#D8C7A3',
+    'Marrón': '#6B4A32', 'Naranja': '#E07B21', 'Amarillo': '#E8C21E'
+  };
+  var colorSel = document.getElementById('f-color');
+  var swatch = document.getElementById('swatch');
+  function syncSwatch() {
+    var c = colors[colorSel.value];
+    swatch.classList.toggle('none', !c);
+    swatch.style.background = c || 'transparent';
+  }
+  colorSel.addEventListener('change', syncSwatch);
+  syncSwatch();
+
+  /* ---------- Today's date as the default ---------- */
+  var d = new Date();
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+  document.getElementById('f-fecha').value = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+
+  /* ---------- Names seen before (suggestions only; stays in this browser) ---------- */
+  var NAMES_KEY = 'lcg-ficha-names';
+  var nameList = document.getElementById('dl-names');
+  function loadNames() {
+    try { return JSON.parse(localStorage.getItem(NAMES_KEY) || '[]'); } catch (e) { return []; }
+  }
+  function renderNames() {
+    nameList.textContent = '';
+    loadNames().forEach(function (n) {
+      var o = document.createElement('option');
+      o.value = n;
+      nameList.appendChild(o);
+    });
+  }
+  function rememberName(n) {
+    n = (n || '').trim();
+    if (!n) return;
+    var list = loadNames().filter(function (x) { return x.toLowerCase() !== n.toLowerCase(); });
+    list.unshift(n);
+    try { localStorage.setItem(NAMES_KEY, JSON.stringify(list.slice(0, 20))); } catch (e) { /* storage unavailable */ }
+    renderNames();
+  }
+  ['f-entrega', 'f-recibe'].forEach(function (id) {
+    document.getElementById(id).addEventListener('change', function (e) { rememberName(e.target.value); });
+  });
+  renderNames();
+
+  /* ---------- State chips: "Sin daños nuevos" excludes the damage chips ---------- */
+  var chips = document.querySelectorAll('#state input[type="checkbox"]');
+  chips.forEach(function (cb) {
+    cb.addEventListener('change', function () {
+      if (!cb.checked) return;
+      chips.forEach(function (other) {
+        if (other === cb) return;
+        if (cb.value === 'ok') other.checked = false;
+        else if (other.value === 'ok') other.checked = false;
+      });
+    });
+  });
+
+  /* ---------- Fuel slider ---------- */
+  var fuel = document.getElementById('fuel');
+  var pctEl = document.getElementById('fuel-pct');
+  var wordEl = document.getElementById('fuel-word');
+  function fuelWord(v) {
+    if (v >= 98) return 'Lleno';
+    if (v <= 2) return 'Vacío';
+    var marks = [[25, '¼'], [50, '½'], [75, '¾']];
+    var best = marks[0];
+    marks.forEach(function (m) { if (Math.abs(m[0] - v) < Math.abs(best[0] - v)) best = m; });
+    return '≈ ' + best[1];
+  }
+  function updateFuel() {
+    var v = Number(fuel.value);
+    fuel.style.setProperty('--p', String(v / 100));
+    pctEl.textContent = v + '%';
+    var w = fuelWord(v);
+    wordEl.textContent = w;
+    fuel.setAttribute('aria-valuetext', v + '%, ' + w.toLowerCase());
+  }
+  fuel.addEventListener('input', updateFuel);
+  updateFuel();
+
+  /* ---------- Photos ---------- */
+  var grid = document.getElementById('photos');
+  var addWrap = document.getElementById('add-wrap');
+  var addTile = document.getElementById('add-tile');
+  var addInput = document.getElementById('add-input');
+  var countEl = document.getElementById('photo-count');
+  var uid = 0;
+
+  var initial = [];
+
+  function updateCount() {
+    var n = grid.querySelectorAll('.photo').length;
+    countEl.textContent = n ? n + (n === 1 ? ' foto' : ' fotos') : '';
+    document.getElementById('photo-section').classList.toggle('no-photos', n === 0);
+  }
+
+  function setImage(img, file) {
+    if (img.dataset.blob === '1') URL.revokeObjectURL(img.src);
+    img.src = URL.createObjectURL(file);
+    img.dataset.blob = '1';
+  }
+
+  function addCard(src, caption, file) {
+    uid += 1;
+    var fig = document.createElement('figure');
+    fig.className = 'photo';
+
+    var imgBtn = document.createElement('button');
+    imgBtn.type = 'button';
+    imgBtn.className = 'photo-img';
+    imgBtn.setAttribute('aria-label', 'Cambiar esta foto');
+    var img = document.createElement('img');
+    img.alt = caption;
+    if (file) { setImage(img, file); } else { img.src = src; }
+    imgBtn.appendChild(img);
+
+    var replaceInput = document.createElement('input');
+    replaceInput.type = 'file';
+    replaceInput.accept = 'image/*';
+    replaceInput.hidden = true;
+    replaceInput.id = 'replace-' + uid;
+    imgBtn.addEventListener('click', function () { replaceInput.click(); });
+    replaceInput.addEventListener('change', function () {
+      if (replaceInput.files && replaceInput.files[0]) setImage(img, replaceInput.files[0]);
+      replaceInput.value = '';
+    });
+
+    var bar = document.createElement('div');
+    bar.className = 'photo-bar';
+    var cap = document.createElement('input');
+    cap.type = 'text';
+    cap.id = 'caption-' + uid;
+    cap.value = caption;
+    cap.setAttribute('list', 'dl-views');
+    cap.autocomplete = 'off';
+    cap.placeholder = 'Elige o escribe una descripción';
+    cap.setAttribute('aria-label', 'Descripción de la foto');
+    cap.addEventListener('input', function () { img.alt = cap.value; });
+    var del = document.createElement('button');
+    del.type = 'button';
+    del.className = 'btn-text';
+    del.textContent = 'Quitar';
+    del.addEventListener('click', function () {
+      if (img.dataset.blob === '1') URL.revokeObjectURL(img.src);
+      fig.remove();
+      updateCount();
+    });
+    bar.appendChild(cap);
+    bar.appendChild(del);
+
+    fig.appendChild(imgBtn);
+    fig.appendChild(replaceInput);
+    fig.appendChild(bar);
+    grid.insertBefore(fig, addWrap);
+    updateCount();
+  }
+
+  function handleFiles(files) {
+    Array.prototype.forEach.call(files, function (f) {
+      if (!f.type || f.type.indexOf('image/') !== 0) return;
+      var n = grid.querySelectorAll('.photo').length + 1;
+      addCard(null, 'Foto ' + n, f);
+    });
+  }
+
+  initial.forEach(function (p) { addCard(p[0], p[1]); });
+  updateCount();
+
+  addTile.addEventListener('click', function () { addInput.click(); });
+  addInput.addEventListener('change', function () { handleFiles(addInput.files); addInput.value = ''; });
+
+  ['dragenter', 'dragover'].forEach(function (ev) {
+    grid.addEventListener(ev, function (e) { e.preventDefault(); grid.classList.add('drag'); });
+  });
+  ['dragleave', 'drop'].forEach(function (ev) {
+    grid.addEventListener(ev, function (e) { e.preventDefault(); grid.classList.remove('drag'); });
+  });
+  grid.addEventListener('drop', function (e) {
+    if (e.dataTransfer && e.dataTransfer.files) handleFiles(e.dataTransfer.files);
+  });
+})();
+</script>
